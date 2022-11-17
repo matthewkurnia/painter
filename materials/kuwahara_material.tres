@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=2]
+
+[ext_resource path="res://shaders/kuwahara_basic.gdshader" type="Shader" id=1]
+
+[sub_resource type="OpenSimplexNoise" id=1]
+period = 1.0
+persistence = 0.0
+
+[sub_resource type="NoiseTexture" id=2]
+seamless = true
+as_normalmap = true
+noise = SubResource( 1 )
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/radius = 3
+shader_param/offset = Vector3( 0, 0, 0 )
+shader_param/canvas = SubResource( 2 )

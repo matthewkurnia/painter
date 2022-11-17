@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[ext_resource path="res://shaders/value_grouping.gdshader" type="Shader" id=1]
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/highlight_threshold = 0.9
+shader_param/highlight_fade_distance = 0.05
+shader_param/highlight_lod = 2.0
+shader_param/shadow_threshold = 0.2
+shader_param/shadow_fade_distance = 0.05
+shader_param/shadow_lod = 6.5
+shader_param/shadow_bias = Color( 0.394531, 0.152258, 0.0631866, 1 )
