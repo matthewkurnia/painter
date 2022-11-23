@@ -4,10 +4,11 @@
 
 [resource]
 shader = ExtResource( 1 )
-shader_param/highlight_threshold = 0.9
-shader_param/highlight_fade_distance = 0.05
-shader_param/highlight_lod = 2.0
+shader_param/highlight_threshold = 0.811
+shader_param/highlight_fade_distance = 0.2
+shader_param/highlight_lod = 3.5
+shader_param/highlight_bias = Color( 0.101961, 0.101961, 0.101961, 0 )
 shader_param/shadow_threshold = 0.2
 shader_param/shadow_fade_distance = 0.05
-shader_param/shadow_lod = 6.5
-shader_param/shadow_bias = Color( 0.394531, 0.152258, 0.0631866, 1 )
+shader_param/shadow_lod = 4.0
+shader_param/shadow_bias = Color( 0.360784, 0.145098, 0.0627451, 0.34902 )
