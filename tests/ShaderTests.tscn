@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://assets/zaanse-schans-windmills-871287755496PrsW.png" type="Texture" id=1]
-[ext_resource path="res://assets/halloween-still-life-19441290201214vfM.png" type="Texture" id=2]
-[ext_resource path="res://materials/value_grouping.tres" type="Material" id=3]
+[ext_resource path="res://assets/2d/zaanse-schans-windmills-871287755496PrsW.png" type="Texture" id=1]
+[ext_resource path="res://assets/2d/halloween-still-life-19441290201214vfM.png" type="Texture" id=2]
+[ext_resource path="res://materials/value_grouping_material.tres" type="Material" id=3]
 
 [node name="ShaderTests" type="Node2D"]
 
