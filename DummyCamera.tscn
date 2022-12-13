@@ -1,0 +1,10 @@
+[gd_scene format=2]
+
+[node name="DummyCamera" type="Camera"]
+transform = Transform( -0.940401, -0.0511925, -0.336192, 0, 0.988604, -0.150536, 0.340068, -0.141564, -0.929685, 3.13308, 3.97379, 5.1858 )
+
+[node name="BaseRemote" type="RemoteTransform" parent="."]
+
+[node name="DepthMotionRemote" type="RemoteTransform" parent="."]
+
+[node name="BufferedRemote" type="RemoteTransform" parent="."]

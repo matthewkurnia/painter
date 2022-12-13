@@ -1,0 +1,244 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://painter/Strokes.tscn" type="PackedScene" id=1]
+[ext_resource path="res://shaders/strokes.gdshader" type="Shader" id=2]
+[ext_resource path="res://icon.png" type="Texture" id=4]
+[ext_resource path="res://SceneManager.tscn" type="PackedScene" id=5]
+
+[sub_resource type="Gradient" id=12]
+offsets = PoolRealArray( 0, 0.128889, 0.884444, 1 )
+colors = PoolColorArray( 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 )
+
+[sub_resource type="GradientTexture" id=13]
+gradient = SubResource( 12 )
+
+[sub_resource type="ViewportTexture" id=14]
+viewport_path = NodePath("SceneManager/DepthMotion")
+
+[sub_resource type="ViewportTexture" id=15]
+viewport_path = NodePath("SceneManager/Base")
+
+[sub_resource type="ShaderMaterial" id=5]
+resource_local_to_scene = true
+shader = ExtResource( 2 )
+shader_param/direction = Vector3( 1, 0, 0 )
+shader_param/spread = 45.0
+shader_param/flatness = null
+shader_param/initial_linear_velocity = null
+shader_param/initial_angle = 720.0
+shader_param/angular_velocity = null
+shader_param/orbit_velocity = null
+shader_param/linear_accel = null
+shader_param/radial_accel = null
+shader_param/tangent_accel = null
+shader_param/damping = null
+shader_param/scale = 0.2
+shader_param/hue_variation = null
+shader_param/anim_speed = null
+shader_param/anim_offset = null
+shader_param/initial_linear_velocity_random = null
+shader_param/initial_angle_random = 1.0
+shader_param/angular_velocity_random = null
+shader_param/orbit_velocity_random = null
+shader_param/linear_accel_random = null
+shader_param/radial_accel_random = null
+shader_param/tangent_accel_random = null
+shader_param/damping_random = null
+shader_param/scale_random = null
+shader_param/hue_variation_random = null
+shader_param/anim_speed_random = null
+shader_param/anim_offset_random = null
+shader_param/lifetime_randomness = null
+shader_param/emission_box_extents = Vector3( 480, 640, 1 )
+shader_param/color_value = Color( 1, 1, 1, 1 )
+shader_param/trail_divisor = 1
+shader_param/gravity = null
+shader_param/color_ramp = SubResource( 13 )
+shader_param/source = SubResource( 15 )
+shader_param/depth_motion = SubResource( 14 )
+
+[sub_resource type="Shader" id=9]
+code = "shader_type canvas_item;
+
+uniform float highlight_threshold: hint_range(0.0, 1.0) = 0.9;
+uniform float highlight_fade_distance: hint_range(0.0, 0.2) = 0.05;
+uniform float highlight_lod: hint_range(0.0, 10.0, 0.5) = 2.0;
+uniform vec4 highlight_bias: hint_color;
+uniform float shadow_threshold: hint_range(0.0, 1.0) = 0.2;
+uniform float shadow_fade_distance: hint_range(0.0, 0.2) = 0.05;
+uniform float shadow_lod: hint_range(0.0, 10.0, 0.5) = 4.0;
+uniform vec4 shadow_bias: hint_color;
+
+uniform sampler2D source;
+
+const float PI = 3.14159265358979323846;
+
+float trig_interpolate(float x, float a, float b) {
+	if (x <= a) return 0.0;
+	if (x >= b) return 1.0;
+	return 0.5 + 0.5 * cos(PI * x / (b - a) + (1.0 - a / (b - a)) * PI);
+}
+
+float lum(vec3 c) {
+	return 0.3 * c.r + 0.59 * c.g + 0.11 * c.b;
+}
+
+vec3 clip_color(vec3 c) {
+	vec3 _c = c;
+	float l = lum(_c);
+	float n = min(_c.r, min(_c.g, _c.b));
+	float x = max(_c.r, max(_c.g, _c.b));
+	if (n < 0.0) {
+		_c.r = l + (((_c.r - l) * l) / (l - n));
+		_c.g = l + (((_c.g - l) * l) / (l - n));
+		_c.b = l + (((_c.b - l) * l) / (l - n));
+	}
+	if (x > 1.0) {
+		_c.r = l + (((_c.r - l) * (1.0 - l)) / (l - n));
+		_c.g = l + (((_c.g - l) * (1.0 - l)) / (l - n));
+		_c.b = l + (((_c.b - l) * (1.0 - l)) / (l - n));
+	}
+	return _c;
+}
+
+vec3 set_lum(vec3 c, float l) {
+	float d = l - lum(c);
+	return clip_color(c + vec3(d));
+}
+
+void fragment() {
+	vec2 uv = vec2(UV.x, 1.0 - UV.y);
+	
+	vec4 raw_color;
+	float raw_value;
+	float highlight; float shadow; float midtone;
+	vec4 highlight_color; vec4 shadow_color; vec4 original_color;
+	
+	raw_color = texture(source, uv);
+	
+	raw_value = 0.3 * raw_color.r + 0.59 * raw_color.g + 0.11 * raw_color.b;
+	
+	highlight = trig_interpolate(
+		raw_value,
+		highlight_threshold - highlight_fade_distance,
+		highlight_threshold + highlight_fade_distance
+	);
+	
+	shadow = 1.0 - trig_interpolate(
+		raw_value,
+		shadow_threshold - shadow_fade_distance,
+		shadow_threshold + shadow_fade_distance
+	);
+	
+	highlight_color = vec4(set_lum(
+		textureLod(source, uv, shadow_lod).rgb,
+		highlight_threshold + highlight_fade_distance
+	), 1.0);
+	highlight_color = max(textureLod(source, uv, highlight_lod), highlight_color);
+	
+	shadow_color = vec4(set_lum(
+		textureLod(source, uv, shadow_lod).rgb,
+		shadow_threshold - shadow_fade_distance
+	), 1.0);
+	shadow_color = min(textureLod(source, uv, shadow_lod), shadow_color);
+	
+	original_color = textureLod(source, uv, 0.0);
+	
+	COLOR = mix(original_color, highlight_color, highlight);
+	COLOR = mix(COLOR, shadow_color, shadow);
+//	COLOR = mix(COLOR, textureLod(TEXTURE, UV, shadow_lod), shadow);
+//	COLOR = vec4(set_lum(original_color.rgb, 0.5), 0.5);
+}"
+
+[sub_resource type="ViewportTexture" id=10]
+viewport_path = NodePath("ViewportContainer/Viewport")
+
+[sub_resource type="ShaderMaterial" id=11]
+resource_local_to_scene = true
+shader = SubResource( 9 )
+shader_param/highlight_threshold = 0.9
+shader_param/highlight_fade_distance = 0.05
+shader_param/highlight_lod = 2.0
+shader_param/highlight_bias = null
+shader_param/shadow_threshold = 0.2
+shader_param/shadow_fade_distance = 0.05
+shader_param/shadow_lod = 4.0
+shader_param/shadow_bias = Color( 0, 0, 0, 1 )
+shader_param/source = SubResource( 10 )
+
+[sub_resource type="Shader" id=6]
+code = "shader_type canvas_item;
+
+void fragment() {
+	COLOR = textureLod(TEXTURE, UV, 10);
+//	COLOR = vec4(1, 1, 1, 1);
+}"
+
+[sub_resource type="ShaderMaterial" id=7]
+shader = SubResource( 6 )
+
+[sub_resource type="ViewportTexture" id=8]
+viewport_path = NodePath("ViewportContainer/Viewport")
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="SceneManager" parent="." instance=ExtResource( 5 )]
+
+[node name="Camera" parent="SceneManager/Buffered" index="0"]
+transform = Transform( -0.940401, 0.0249359, -0.339153, 0, 0.997308, 0.0733261, 0.340068, 0.068956, -0.937869, 1.15891, 5.17152, -0.273441 )
+
+[node name="Base" parent="SceneManager" index="1"]
+render_target_v_flip = true
+
+[node name="Camera" parent="SceneManager/Base" index="0"]
+transform = Transform( -0.940401, 0.0249359, -0.339153, 0, 0.997308, 0.0733261, 0.340068, 0.068956, -0.937869, 1.15891, 5.17152, -0.273441 )
+
+[node name="DepthMotion" parent="SceneManager" index="2"]
+render_target_v_flip = true
+
+[node name="Camera" parent="SceneManager/DepthMotion" index="0"]
+transform = Transform( -0.940401, 0.0249359, -0.339153, 0, 0.997308, 0.0733261, 0.340068, 0.068956, -0.937869, 1.15891, 5.17152, -0.273441 )
+
+[node name="Pivot" parent="SceneManager" index="3"]
+transform = Transform( -0.940401, -0.0511923, -0.336192, 0, 0.988604, -0.150536, 0.340068, -0.141564, -0.929685, 3.13308, 3.97379, 5.1858 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.870588, 0.803922, 0.756863, 1 )
+
+[node name="BrushStrokesContainer1" type="ViewportContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+stretch = true
+
+[node name="Viewport" type="Viewport" parent="BrushStrokesContainer1"]
+size = Vector2( 1024, 600 )
+transparent_bg = true
+handle_input_locally = false
+render_target_update_mode = 3
+
+[node name="Strokes" parent="BrushStrokesContainer1/Viewport" instance=ExtResource( 1 )]
+lifetime = 2.0
+preprocess = 600.0
+process_material = SubResource( 5 )
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+visible = false
+material = SubResource( 11 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 4 )
+expand = true
+
+[node name="TextureRect" type="TextureRect" parent="."]
+visible = false
+material = SubResource( 7 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = SubResource( 8 )
+
+[editable path="SceneManager"]
+[editable path="SceneManager/Pivot/DummyCamera"]

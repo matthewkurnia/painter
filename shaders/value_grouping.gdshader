@@ -10,60 +10,38 @@ uniform float shadow_lod: hint_range(0.0, 10.0, 0.5) = 4.0;
 uniform vec4 shadow_bias: hint_color;
 
 const float PI = 3.14159265358979323846;
-const float X_ABS = 1.0;
-const float Y_ABS = 1.0;
-const float Z_ABS = 1.0;
-
-const mat3 mat_rgb_to_xyz = mat3(
-	vec3(0.412453, 0.212671, 0.019334),
-	vec3(0.357580, 0.715160, 0.119193),
-	vec3(0.180423, 0.072169, 0.950227)
-);
-
-const mat3 mat_xyz_to_rgb = mat3(
-	vec3(3.240479, -0.969256, 0.055648),
-	vec3(-1.537150, 1.875992, -0.204043),
-	vec3(-0.498535, 0.041556, 1.057311)
-);
-
-vec3 rgb_to_xyz(vec3 input) {
-	return mat_rgb_to_xyz * input;
-}
-
-vec3 xyz_to_rgb(vec3 input) {
-	return mat_xyz_to_rgb * input;
-}
-
-float f(float t) {
-	if (t > 0.008856) return pow(t, 0.333333);
-	return 7.787 * t + 0.137931;
-}
-
-vec3 xyz_to_cielab(vec3 input) {
-	float xn = input.x / X_ABS;
-	float yn = input.y / Y_ABS;
-	float zn = input.z / Z_ABS;
-	float l = 903.3 * yn;
-	if (yn > 0.008856) l = 116.0 * pow(yn, 0.333333) - 16.0;
-	return vec3(l, 500.0 * (f(xn) - f(yn)), 200.0 * (f(yn) - f(zn)));
-}
-
-vec3 cielab_to_xyz(vec3 input) {
-	float l = input.x;
-	float a = input.y;
-	float b = input.z;
-	float p = (l + 16.0) / 116.0;
-	return vec3(
-		X_ABS * pow(p + a / 500.0, 3.0),
-		Y_ABS * pow(p, 3.0),
-		Z_ABS * pow(p - b / 200.0, 3.0)
-	);
-}
 
 float trig_interpolate(float x, float a, float b) {
 	if (x <= a) return 0.0;
 	if (x >= b) return 1.0;
 	return 0.5 + 0.5 * cos(PI * x / (b - a) + (1.0 - a / (b - a)) * PI);
+}
+
+float lum(vec3 c) {
+	return 0.3 * c.r + 0.59 * c.g + 0.11 * c.b;
+}
+
+vec3 clip_color(vec3 c) {
+	vec3 _c = c;
+	float l = lum(_c);
+	float n = min(_c.r, min(_c.g, _c.b));
+	float x = max(_c.r, max(_c.g, _c.b));
+	if (n < 0.0) {
+		_c.r = l + (((_c.r - l) * l) / (l - n));
+		_c.g = l + (((_c.g - l) * l) / (l - n));
+		_c.b = l + (((_c.b - l) * l) / (l - n));
+	}
+	if (x > 1.0) {
+		_c.r = l + (((_c.r - l) * (1.0 - l)) / (l - n));
+		_c.g = l + (((_c.g - l) * (1.0 - l)) / (l - n));
+		_c.b = l + (((_c.b - l) * (1.0 - l)) / (l - n));
+	}
+	return _c;
+}
+
+vec3 set_lum(vec3 c, float l) {
+	float d = l - lum(c);
+	return clip_color(c + vec3(d));
 }
 
 void fragment() {
@@ -88,32 +66,22 @@ void fragment() {
 		shadow_threshold + shadow_fade_distance
 	);
 	
-	float highligh_lightness = xyz_to_cielab(rgb_to_xyz(vec3(highlight_threshold + highlight_fade_distance))).x;
-	vec3 highlight_color_temp = xyz_to_cielab(rgb_to_xyz(textureLod(TEXTURE, UV, highlight_lod).rgb));
-	highlight_color = vec4(
-		mix(
-			xyz_to_rgb(cielab_to_xyz(vec3(highligh_lightness, highlight_color_temp.y, highlight_color_temp.z))),
-			highlight_bias.rgb,
-			highlight_bias.a
-		),
-		1.0
-	);
+	highlight_color = vec4(set_lum(
+		textureLod(TEXTURE, UV, shadow_lod).rgb,
+		highlight_threshold + highlight_fade_distance
+	), 1.0);
 	highlight_color = max(textureLod(TEXTURE, UV, highlight_lod), highlight_color);
 	
-	float shadow_lightness = xyz_to_cielab(rgb_to_xyz(vec3(shadow_threshold - shadow_fade_distance))).x;
-	vec3 shadow_color_temp = xyz_to_cielab(rgb_to_xyz(textureLod(TEXTURE, UV, shadow_lod).rgb));
-	shadow_color = vec4(
-		mix(
-			xyz_to_rgb(cielab_to_xyz(vec3(shadow_lightness, shadow_color_temp.y, shadow_color_temp.z))),
-			shadow_bias.rgb,
-			shadow_bias.a
-		),
-		1.0
-	);
+	shadow_color = vec4(set_lum(
+		textureLod(TEXTURE, UV, shadow_lod).rgb,
+		shadow_threshold - shadow_fade_distance
+	), 1.0);
 	shadow_color = min(textureLod(TEXTURE, UV, shadow_lod), shadow_color);
 	
 	original_color = textureLod(TEXTURE, UV, 0.0);
 	
 	COLOR = mix(original_color, highlight_color, highlight);
 	COLOR = mix(COLOR, shadow_color, shadow);
+//	COLOR = mix(COLOR, textureLod(TEXTURE, UV, shadow_lod), shadow);
+//	COLOR = vec4(set_lum(original_color.rgb, 0.5), 0.5);
 }

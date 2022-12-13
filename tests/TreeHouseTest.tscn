@@ -1,8 +1,25 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://assets/3d/tree_house/scene.gltf" type="PackedScene" id=1]
-[ext_resource path="res://assets/3d/tree_house/Trees.material" type="Material" id=2]
+[ext_resource path="res://assets/3d/tree_house/Trees_.material" type="Material" id=2]
 [ext_resource path="res://materials/cbuffer_debug_material.tres" type="Material" id=3]
+[ext_resource path="res://assets/tree_house/Ropes_and_glass.material" type="Material" id=4]
+[ext_resource path="res://assets/tree_house/Painted_wood-NOT.material" type="Material" id=5]
+[ext_resource path="res://assets/3d/tree_house/Props1.material" type="Material" id=6]
+[ext_resource path="res://assets/3d/tree_house/Furniture.material" type="Material" id=7]
+[ext_resource path="res://assets/3d/tree_house/Painted_wood.material" type="Material" id=8]
+[ext_resource path="res://assets/3d/tree_house/Roofus.material" type="Material" id=9]
+[ext_resource path="res://assets/3d/tree_house/Ropes_and_glass.material" type="Material" id=10]
+
+[sub_resource type="Environment" id=5]
+ambient_light_color = Color( 0.589844, 0.819049, 1, 1 )
+fog_enabled = true
+fog_color = Color( 0.501961, 0.6, 0.701961, 1 )
+fog_sun_color = Color( 1, 0.901961, 0.701961, 1 )
+fog_height_enabled = true
+fog_height_max = -56.5
+ssao_enabled = true
+adjustment_contrast = 1.08
 
 [sub_resource type="ShaderMaterial" id=1]
 
@@ -21,24 +38,58 @@ shader = SubResource( 3 )
 
 [node name="scene" instance=ExtResource( 1 )]
 
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." index="0"]
+environment = SubResource( 5 )
+
 [node name="Sphere_Envi_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/Sphere" index="0"]
 material_buffered = SubResource( 1 )
 
 [node name="Cylinder451_Trees_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/Cylinder451" index="0"]
 transform = Transform( 1, 7.45058e-09, -3.72529e-09, 0, 1, 2.98023e-08, -3.72529e-09, 0, 1, 0, 0, 0 )
+material/0 = ExtResource( 2 )
+
+[node name="Cylinder007_Trees_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/Cylinder007" index="0"]
+material/0 = ExtResource( 2 )
 
 [node name="All_house_Trees_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/All_house" index="0"]
-material_buffered = ExtResource( 3 )
 material/0 = ExtResource( 2 )
 
 [node name="All_house_Painted_wood-NOT_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/All_house" index="1"]
 material_buffered = ExtResource( 3 )
+material/0 = ExtResource( 5 )
 
-[node name="DirectionalLight" type="DirectionalLight" parent="." index="1"]
-transform = Transform( 0.625719, 0.363382, 0.690238, 0, -0.884866, 0.465846, 0.780048, -0.291489, -0.553678, -0.158634, 2.17221, 5.18597 )
+[node name="All_house_Furniture_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/All_house" index="2"]
+material/0 = ExtResource( 7 )
+
+[node name="All_house_Props1_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/All_house" index="3"]
+material/0 = ExtResource( 6 )
+
+[node name="All_house_Painted_wood_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/All_house" index="4"]
+material/0 = ExtResource( 8 )
+
+[node name="All_house_Roofus_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/All_house" index="5"]
+material/0 = ExtResource( 9 )
+
+[node name="All_house_Ropes_and_glass_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/All_house" index="6"]
+material/0 = ExtResource( 4 )
+
+[node name="Circle000_Props1_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/Circle000" index="0"]
+material/0 = ExtResource( 6 )
+
+[node name="Circle000_Furniture_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/Circle000" index="1"]
+material/0 = ExtResource( 7 )
+
+[node name="Circle000_Ropes_and_glass_0" parent="Sketchfab_model/ce59323e75fa46e0ad765f0b9107082bfbx/RootNode/Circle000" index="2"]
+material/0 = ExtResource( 10 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="." index="2"]
+transform = Transform( 0.997078, 0.0355852, 0.0675935, 0, -0.884866, 0.465846, 0.0763885, -0.464485, -0.88228, 2.84112, 3.95048, 5.18597 )
+light_color = Color( 1, 0.94902, 0.886275, 1 )
+light_energy = 10.663
 shadow_enabled = true
+shadow_color = Color( 0.0431373, 0.0705882, 0.12549, 1 )
 
-[node name="MeshInstance" type="MeshInstance" parent="." index="2"]
+[node name="MeshInstance" type="MeshInstance" parent="." index="3"]
 transform = Transform( -3.94843, 0, 2.67741, 0, 4.7706, 0, -2.67741, 0, -3.94843, 19.0198, 0.941526, -8.26383 )
 mesh = SubResource( 2 )
 material/0 = SubResource( 4 )

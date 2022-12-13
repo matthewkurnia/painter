@@ -1,0 +1,112 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=2]
+
+[sub_resource type="Shader" id=7]
+code = "shader_type canvas_item;
+
+uniform int buffer_width: hint_range(5, 1000, 1);
+uniform int kernel_size: hint_range(0, 5, 1);
+uniform sampler2D noise;
+
+const float PI = 3.14159265358979323846;
+const vec2 B0 = vec2(0.0, 0.0);
+const vec2 B1 = vec2(0.5, 0.0);
+const vec2 B2 = vec2(0.5, 1.0);
+const vec2 B3 = vec2(1.0, 1.0);
+
+float trig_interpolate(float x, float a, float b) {
+	if (x <= a) return 0.0;
+	if (x >= b) return 1.0;
+	return 0.5 + 0.5 * cos(PI * x / (b - a) + (1.0 - a / (b - a)) * PI);
+}
+
+vec2 bezier_interpolate(vec2 q0, vec2 q1, vec2 q2, vec2 q3, float t) {
+	q0 = mix(q0, q1, t);
+	q1 = mix(q1, q2, t);
+	q2 = mix(q2, q3, t);
+	q0 = mix(q0, q1, t);
+	q1 = mix(q1, q2, t);
+	q0 = mix(q0, q1, t);
+	return q0;
+}
+
+void fragment() {
+	float horizontal_resolution = float(buffer_width);
+	vec2 ratio = vec2(1.0, TEXTURE_PIXEL_SIZE.x / TEXTURE_PIXEL_SIZE.y);
+	vec2 pixelated_uv = floor(UV * horizontal_resolution * ratio) / (horizontal_resolution * ratio);
+	
+	vec4 color1 = mix(
+		mix(
+			texture(TEXTURE, pixelated_uv),
+			texture(TEXTURE, pixelated_uv + vec2(sign(UV.x - pixelated_uv.x) / horizontal_resolution, 0)),
+//			bezier_interpolate(B0, B1, B2, B3, abs(UV.x - pixelated_uv.x) * horizontal_resolution).y
+			abs(UV.x - pixelated_uv.x) * horizontal_resolution
+		),
+		mix(
+			texture(TEXTURE, pixelated_uv + vec2(0.0, sign(UV.y - pixelated_uv.y) / (horizontal_resolution * ratio.y))),
+			texture(TEXTURE, pixelated_uv + vec2(sign(UV.x - pixelated_uv.x) / horizontal_resolution, sign(UV.y - pixelated_uv.y) / (horizontal_resolution * ratio.y))),
+//			bezier_interpolate(B0, B1, B2, B3, abs(UV.x - pixelated_uv.x) * horizontal_resolution).y
+			abs(UV.x - pixelated_uv.x) * horizontal_resolution
+		),
+//		bezier_interpolate(B0, B1, B2, B3, (UV.y - pixelated_uv.y) * horizontal_resolution * ratio.y).y
+		(UV.y - pixelated_uv.y) * horizontal_resolution * ratio.y
+	);
+	
+	vec4 color2 = mix(
+		mix(
+			texture(TEXTURE, pixelated_uv),
+			texture(TEXTURE, pixelated_uv + vec2(sign(UV.x - pixelated_uv.x) / horizontal_resolution, 0)),
+			bezier_interpolate(B0, B1, B2, B3, abs(UV.x - pixelated_uv.x) * horizontal_resolution).y
+//			abs(UV.x - pixelated_uv.x) * horizontal_resolution
+		),
+		mix(
+			texture(TEXTURE, pixelated_uv + vec2(0.0, sign(UV.y - pixelated_uv.y) / (horizontal_resolution * ratio.y))),
+			texture(TEXTURE, pixelated_uv + vec2(sign(UV.x - pixelated_uv.x) / horizontal_resolution, sign(UV.y - pixelated_uv.y) / (horizontal_resolution * ratio.y))),
+			bezier_interpolate(B0, B1, B2, B3, abs(UV.x - pixelated_uv.x) * horizontal_resolution).y
+//			abs(UV.x - pixelated_uv.x) * horizontal_resolution
+		),
+		bezier_interpolate(B0, B1, B2, B3, (UV.y - pixelated_uv.y) * horizontal_resolution * ratio.y).y
+//		(UV.y - pixelated_uv.y) * horizontal_resolution * ratio.y
+	);
+	
+	vec4 color3 = mix(
+		mix(
+			texture(TEXTURE, pixelated_uv),
+			texture(TEXTURE, pixelated_uv + vec2(sign(UV.x - pixelated_uv.x) / horizontal_resolution, 0)),
+//			bezier_interpolate(B0, B1, B2, B3, abs(UV.x - pixelated_uv.x) * horizontal_resolution).y
+			trig_interpolate(abs(UV.x - pixelated_uv.x) * horizontal_resolution, 0.0, 1.0)
+		),
+		mix(
+			texture(TEXTURE, pixelated_uv + vec2(0.0, sign(UV.y - pixelated_uv.y) / (horizontal_resolution * ratio.y))),
+			texture(TEXTURE, pixelated_uv + vec2(sign(UV.x - pixelated_uv.x) / horizontal_resolution, sign(UV.y - pixelated_uv.y) / (horizontal_resolution * ratio.y))),
+//			bezier_interpolate(B0, B1, B2, B3, abs(UV.x - pixelated_uv.x) * horizontal_resolution).y
+			trig_interpolate(abs(UV.x - pixelated_uv.x) * horizontal_resolution, 0.0, 1.0)
+		),
+//		bezier_interpolate(B0, B1, B2, B3, (UV.y - pixelated_uv.y) * horizontal_resolution * ratio.y).y
+		trig_interpolate((UV.y - pixelated_uv.y) * horizontal_resolution * ratio.y, 0.0, 1.0)
+	);
+	
+	vec4 sum;
+	for (int i = -kernel_size; i <= kernel_size; i++) {
+		for (int j = -kernel_size; j <= kernel_size; j++) {
+			sum += texture(TEXTURE, UV + vec2(float(i) / (horizontal_resolution * 3.0), float(j) / (horizontal_resolution * ratio.y * 3.0)));
+		}
+	}
+//	sum = sum / 9.0;
+	sum = sum / pow(2.0 * float(kernel_size) + 1.0, 2);
+	
+	COLOR = mix(color1, color2, 0.5);
+//	COLOR = mix(COLOR, color3, 0.0);
+//	COLOR = sum;
+//	COLOR = texture(noise, UV);
+}"
+
+[sub_resource type="OpenSimplexNoise" id=8]
+
+[sub_resource type="NoiseTexture" id=9]
+noise = SubResource( 8 )
+
+[resource]
+shader = SubResource( 7 )
+shader_param/buffer_width = 50
+shader_param/kernel_size = 1
+shader_param/noise = SubResource( 9 )

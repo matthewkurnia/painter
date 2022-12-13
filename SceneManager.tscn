@@ -1,0 +1,247 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://SceneManager.gd" type="Script" id=1]
+[ext_resource path="res://tests/BasicScene.tscn" type="PackedScene" id=2]
+[ext_resource path="res://DummyCamera.tscn" type="PackedScene" id=3]
+[ext_resource path="res://MotionTracker.gd" type="Script" id=4]
+
+[sub_resource type="QuadMesh" id=1]
+
+[sub_resource type="Shader" id=4]
+code = "shader_type spatial;
+render_mode unshaded;
+
+void fragment() {
+	ALBEDO = texture(CBUFFER, SCREEN_UV).rgb;
+}
+"
+
+[sub_resource type="ShaderMaterial" id=5]
+shader = SubResource( 4 )
+
+[sub_resource type="Shader" id=2]
+code = "shader_type spatial;
+render_mode cull_disabled, unshaded;
+
+uniform vec3 linear_velocity;
+uniform vec3 angular_velocity;
+
+void fragment() { 
+	float depth = texture(DEPTH_TEXTURE, SCREEN_UV).r;
+	
+	//Turn the current pixel from ndc to world coordinates
+	vec3 pixel_pos_ndc = vec3(SCREEN_UV * 2.0 - 1.0, depth * 2.0 - 1.0); 
+    vec4 pixel_pos_clip = INV_PROJECTION_MATRIX * vec4(pixel_pos_ndc,1.0);
+    vec3 pixel_pos_cam = pixel_pos_clip.xyz / pixel_pos_clip.w;
+	vec3 pixel_pos_world = (CAMERA_MATRIX * vec4(pixel_pos_cam, 1.0)).xyz;
+	
+	//Calculate total velocity which combines linear velocity and angular velocity
+	vec3 cam_pos = CAMERA_MATRIX[3].xyz; //Correct
+	vec3 r = pixel_pos_world - cam_pos;
+	vec3 total_velocity = linear_velocity + cross(angular_velocity, r);
+	
+	//Offset the world pos by the total velocity, then project back to ndc coordinates
+	vec3 pixel_prevpos_world = pixel_pos_world - total_velocity;
+	vec3 pixel_prevpos_cam =  (INV_CAMERA_MATRIX * vec4(pixel_prevpos_world, 1.0)).xyz;
+	vec4 pixel_prevpos_clip =  PROJECTION_MATRIX * vec4(pixel_prevpos_cam, 1.0);
+	vec3 pixel_prevpos_ndc = pixel_prevpos_clip.xyz / pixel_prevpos_clip.w;
+	
+	//Calculate how much the pixel moved in ndc space
+	vec2 pixel_diff_ndc = pixel_prevpos_ndc.xy - pixel_pos_ndc.xy;
+//	pixel_diff_ndc = pixel_diff_ndc * vec2(512.0, 300.0) + vec2(512.0, 300.0);
+	
+//	ALBEDO = pow(vec3(0.5, 0.5, 0.5), vec3(2.2));
+//	ALBEDO = vec3(0.5, 0.5, 0.5);
+//	ALBEDO = pow(vec3(vec2(0.5), depth), vec3(2.2));
+	ALBEDO = pow(vec3(pixel_diff_ndc * 50.0 + vec2(0.5), depth), vec3(2.2));
+//	ALBEDO = pow(vec3(pixel_diff_ndc, depth), vec3(2.2));
+//	ALBEDO = vec3(pixel_diff_ndc * 0.5 + vec2(0.5), depth);
+//	ALBEDO = vec3(pixel_pos_world);
+}"
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = SubResource( 2 )
+shader_param/linear_velocity = null
+shader_param/angular_velocity = null
+
+[sub_resource type="Animation" id=6]
+resource_name = "Loop"
+length = 16.0
+loop = true
+tracks/0/type = "transform"
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = PoolRealArray( 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 8, 1, 0, 0, 0, 0, 1, 0, -4.37114e-08, 1, 1, 1, 12, 1, 0, 0, 0, 0, 0.707107, 0, 0.707107, 1, 1, 1 )
+
+[sub_resource type="Animation" id=7]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:translation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( 3.13308, 3.97379, 5.1858 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath(".:rotation_degrees")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( 8.65798, -160.119, 0 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath(".:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( 1, 0.999999, 1 ) ]
+}
+tracks/3/type = "transform"
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = PoolRealArray( 0, 1, 0, 1.50365, 5.12715, -0.108121, 0, 0, 0.994138, 1, 1, 1 )
+tracks/4/type = "value"
+tracks/4/path = NodePath("..:rotation_degrees")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector3( 0, 0, 0 ) ]
+}
+
+[sub_resource type="SphereMesh" id=8]
+
+[sub_resource type="SpatialMaterial" id=11]
+flags_unshaded = true
+albedo_color = Color( 0.498039, 0, 0, 1 )
+
+[sub_resource type="Shader" id=12]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform float x = 0.5;
+
+void fragment() {
+	ALBEDO = pow(vec3(x, 0.0, 0.0), vec3(2.2));
+//	ALBEDO = texture(SCREEN_TEXTURE, SCREEN_UV).rgb;
+}"
+
+[sub_resource type="ShaderMaterial" id=13]
+shader = SubResource( 12 )
+shader_param/x = 0.5
+
+[node name="SceneManager" type="ViewportContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+stretch = true
+script = ExtResource( 1 )
+
+[node name="Buffered" type="Viewport" parent="."]
+size = Vector2( 1024, 600 )
+handle_input_locally = false
+hdr = false
+render_target_update_mode = 3
+shadow_atlas_size = 4096
+
+[node name="Camera" type="Camera" parent="Buffered"]
+transform = Transform( 1, 0, 0, 0, 0.974905, 0.222621, 0, -0.222621, 0.974905, 0, 2.05798, 5.55877 )
+cull_mask = 1048572
+current = true
+
+[node name="MeshInstance" type="MeshInstance" parent="Buffered/Camera"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.2 )
+layers = 4
+mesh = SubResource( 1 )
+material/0 = SubResource( 5 )
+
+[node name="Base" type="Viewport" parent="."]
+size = Vector2( 1024, 600 )
+handle_input_locally = false
+hdr = false
+render_target_update_mode = 3
+shadow_atlas_size = 4096
+
+[node name="Camera" type="Camera" parent="Base"]
+transform = Transform( 1, 0, 0, 0, 0.974905, 0.222621, 0, -0.222621, 0.974905, 0, 2.05798, 5.55877 )
+cull_mask = 1048569
+current = true
+
+[node name="DepthMotion" type="Viewport" parent="."]
+size = Vector2( 1024, 600 )
+handle_input_locally = false
+use_32_bpc_depth = true
+render_target_update_mode = 3
+shadow_atlas_size = 4096
+
+[node name="Camera" type="Camera" parent="DepthMotion"]
+transform = Transform( 1, 0, 0, 0, 0.974905, 0.222621, 0, -0.222621, 0.974905, 0, 2.05798, 5.55877 )
+cull_mask = 1048570
+current = true
+
+[node name="MeshInstance" type="MeshInstance" parent="DepthMotion/Camera"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.2 )
+layers = 2
+mesh = SubResource( 1 )
+material/0 = SubResource( 3 )
+script = ExtResource( 4 )
+
+[node name="Pivot" type="Spatial" parent="."]
+transform = Transform( -0.940401, -0.0511923, -0.336192, 0, 0.988604, -0.150536, 0.340068, -0.141564, -0.929685, 3.13308, 3.97379, 5.1858 )
+
+[node name="DummyCamera" parent="Pivot" instance=ExtResource( 3 )]
+transform = Transform( 1, 0, 0, 0, 0.974905, 0.222621, 0, -0.222621, 0.974905, 0, 2.05798, 5.55877 )
+
+[node name="BaseRemote" parent="Pivot/DummyCamera" index="0"]
+remote_path = NodePath("../../../Base/Camera")
+
+[node name="DepthMotionRemote" parent="Pivot/DummyCamera" index="1"]
+remote_path = NodePath("../../../DepthMotion/Camera")
+
+[node name="BufferedRemote" parent="Pivot/DummyCamera" index="2"]
+remote_path = NodePath("../../../Buffered/Camera")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Pivot"]
+autoplay = "Loop"
+anims/Loop = SubResource( 6 )
+anims/RESET = SubResource( 7 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Pivot"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 18.9631 )
+mesh = SubResource( 8 )
+skeleton = NodePath("../..")
+material/0 = SubResource( 11 )
+
+[node name="MeshInstance2" type="MeshInstance" parent="Pivot"]
+transform = Transform( 1, 3.72529e-09, 0, 3.72529e-09, 1, -1.49012e-08, 2.98023e-08, 2.98023e-08, 1, -1.46105, -0.0795362, 18.4408 )
+mesh = SubResource( 8 )
+skeleton = NodePath("../..")
+material/0 = SubResource( 13 )
+
+[node name="BasicScene" parent="." instance=ExtResource( 2 )]
+
+[editable path="Pivot/DummyCamera"]
