@@ -5,10 +5,10 @@ type="Translation"
 
 [deps]
 
-files=[ "res://pds/points.0.014487646616029116.translation" ]
+files=[ "res://pds/points.0.00019845097478237152.translation" ]
 
 source_file="res://pds/points.csv"
-dest_files=[ "res://pds/points.0.014487646616029116.translation" ]
+dest_files=[ "res://pds/points.0.00019845097478237152.translation" ]
 
 [params]
 
