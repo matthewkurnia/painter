@@ -179,6 +179,7 @@ void vertex() {
 	);
 //	COLOR = vec4(normalized_position, (hue_rot_mat * textureLod(color_ramp, vec2(tv, 0.0), 0.0)).a, 1.0);
 	COLOR = texture(source, normalized_position);
+	COLOR = vec4(1.0);
 //	COLOR.rgb = vec3(normalized_position, 0.0);
 	float alpha = (hue_rot_mat * textureLod(color_ramp, vec2(tv, 0.0), 0.0)).a;
 	COLOR.a = alpha;
@@ -195,10 +196,6 @@ void vertex() {
 	TRANSFORM[3].z = 0.0;
 	if (CUSTOM.y > CUSTOM.w) {		ACTIVE = false;
 	}
-}
-
-void fragment() {
-	
 }
 "
 

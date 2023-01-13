@@ -1,0 +1,16 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+
+[deps]
+
+files=[ "res://pds/points.0.014487646616029116.translation" ]
+
+source_file="res://pds/points.csv"
+dest_files=[ "res://pds/points.0.014487646616029116.translation" ]
+
+[params]
+
+compress=true
+delimiter=0

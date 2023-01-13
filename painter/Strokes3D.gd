@@ -1,5 +1,5 @@
 tool
-extends Particles2D
+extends Particles
 
 
 const POINTS_DATA_PATH := "res://pds/points.csv"
@@ -40,6 +40,7 @@ func strokes_setup():
 	self.process_material.set_shader_param("raw_position_data", image_texture)
 	self.amount = config["amount"]
 	print("Strokes setup with config: ", config)
+	self.process_material.set_shader_param("amount", config["amount"])
 	self.process_material.set_shader_param(
 		"emission_box_extents",
 		Vector3(config["width"] / 2, config["height"] / 2, 1.0)
@@ -55,10 +56,4 @@ func _enter_tree():
 func _ready():
 	if Engine.editor_hint:
 		return
-	var extents = get_viewport_rect().size / 2
-	self.position = extents
-	self.process_material.set_shader_param(
-		"emission_box_extents",
-		Vector3(extents.x, extents.y, 1.0)
-	)
 	strokes_setup()

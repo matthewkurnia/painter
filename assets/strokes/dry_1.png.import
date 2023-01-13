@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/leinwand-orange-textur-hintergrund.png-9db58740ded50aa73c4e111bac553a9e.s3tc.stex"
-path.etc2="res://.import/leinwand-orange-textur-hintergrund.png-9db58740ded50aa73c4e111bac553a9e.etc2.stex"
+path.s3tc="res://.import/dry_1.png-2a021473cfc50e9be6a1a93f7a1020b9.s3tc.stex"
+path.etc2="res://.import/dry_1.png-2a021473cfc50e9be6a1a93f7a1020b9.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/2d/leinwand-orange-textur-hintergrund.png"
-dest_files=[ "res://.import/leinwand-orange-textur-hintergrund.png-9db58740ded50aa73c4e111bac553a9e.s3tc.stex", "res://.import/leinwand-orange-textur-hintergrund.png-9db58740ded50aa73c4e111bac553a9e.etc2.stex" ]
+source_file="res://assets/strokes/dry_1.png"
+dest_files=[ "res://.import/dry_1.png-2a021473cfc50e9be6a1a93f7a1020b9.s3tc.stex", "res://.import/dry_1.png-2a021473cfc50e9be6a1a93f7a1020b9.etc2.stex" ]
 
 [params]
 
