@@ -95,6 +95,7 @@ void fragment() {
 	sum = sum / pow(2.0 * float(kernel_size) + 1.0, 2);
 	
 	COLOR = mix(color1, color2, 0.5);
+	COLOR = color2;
 //	COLOR = mix(COLOR, color3, 0.0);
 //	COLOR = sum;
 //	COLOR = texture(noise, UV);
@@ -107,6 +108,6 @@ noise = SubResource( 8 )
 
 [resource]
 shader = SubResource( 7 )
-shader_param/buffer_width = 50
+shader_param/buffer_width = 7
 shader_param/kernel_size = 1
 shader_param/noise = SubResource( 9 )

@@ -49,10 +49,19 @@ void vertex() {
 	
 	uint alt_seed = hash(uint(INDEX) + RANDOM_SEED);
 	
-	// initializes the angle of stroke
-	if (CUSTOM.x == 0.0) CUSTOM.x = rand_from_seed(alt_seed) * 2.0 * PI;
-	
 	vec2 normalized_position = texelFetch(raw_position_data, ivec2(INDEX, 0), 0).xy;
+	
+	// initializes the stroke
+	if (CUSTOM.x == 0.0) {
+		CUSTOM.x = rand_from_seed(alt_seed) * 2.0 * PI;
+		if (texture(strokes_output, normalized_position).a < 0.5) {
+			CUSTOM.y = 1.0;
+		} else {
+			CUSTOM.y = 0.0;
+		}
+	}
+	
+	CUSTOM.y = 1.0;
 
 //	vec2 position = normalized_position * 2.0 * emission_box_extents.xy - emission_box_extents.xy;
 	vec2 position = (normalized_position - 0.5 * vec2(1)) * vec2(emission_box_extents.x / emission_box_extents.y, 1);
@@ -62,33 +71,33 @@ void vertex() {
 	
 	float depth = texture(depth_motion, normalized_position).z;
 	
-	if (debug) {
-		if (distance(current_strokes_output, current_frame_color) > respawn_threshold) {
-			COLOR = vec4(vec3(0.0), 0.0);
-		}
-		else {
-			COLOR = vec4(
-				normalized_position.x,
-				normalized_position.y,
-				CUSTOM.x,
-				scale
-			);
-		}
-	} else {
-		COLOR = vec4(
-			normalized_position.x,
-			normalized_position.y,
-			CUSTOM.x,
-			scale
-		);
-	}
+	
+	COLOR = vec4(
+		normalized_position.x,
+		normalized_position.y,
+		CUSTOM.x,
+		scale
+	);
+	
+//	if (distance(current_strokes_output, current_frame_color) > respawn_threshold) {
+//		// respawn
+//		CUSTOM.y = 1.0;
+//	} else {
+//		CUSTOM.y = 0.0;
+//	}
 	
 	// set the transform
 	TRANSFORM[0].xyz = vec3(cos(CUSTOM.x), -sin(CUSTOM.x), 0.0);
 	TRANSFORM[1].xyz = vec3(sin(CUSTOM.x), cos(CUSTOM.x), 0.0);
 	TRANSFORM[2].xyz = vec3(0.0, 0.0, 1.0);
-//	TRANSFORM[3].xyz = vec3(normalized_position, float(INDEX));
-	TRANSFORM[3] = vec4(position, -pow(depth, 20.0), 0.0);
+//	TRANSFORM[3] = vec4(position, -pow(depth, 20.0), 0.0);
+//	TRANSFORM[3] = vec4(position, -float(INDEX) / 100.0, 0.0);
+	if (CUSTOM.y > 0.5) {
+		TRANSFORM[3] = vec4(position, -pow(depth, 20.0) - float(INDEX) * 0.005, 0.0);
+//		TRANSFORM[3] = vec4(position, -float(INDEX) / 100.0, 0.0);
+	} else {
+		TRANSFORM[3] = vec4(vec2(-10000), 0, 0);
+	}
 //	TRANSFORM[3] = vec4(vec2(0), -10.0+float(INDEX)/10.0, 0.0);
 //	TRANSFORM[3].xyz = vec3(float(INDEX)) * 0.1;
 	float base_scale = scale;

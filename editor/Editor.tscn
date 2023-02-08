@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://editor/Canvas.gd" type="Script" id=1]
+[ext_resource path="res://editor/EditorViewport.gd" type="Script" id=2]
+[ext_resource path="res://editor/ZoomPan.gd" type="Script" id=3]
+[ext_resource path="res://editor/EditorInterface.tscn" type="PackedScene" id=4]
+
+[node name="Editor" type="Node"]
+
+[node name="ViewportContainer" type="ViewportContainer" parent="."]
+margin_left = 233.0
+margin_top = 32.0
+margin_right = 772.0
+margin_bottom = 540.0
+stretch = true
+script = ExtResource( 3 )
+
+[node name="Viewport" type="Viewport" parent="ViewportContainer"]
+size = Vector2( 539, 508 )
+handle_input_locally = false
+render_target_update_mode = 3
+script = ExtResource( 2 )
+
+[node name="Canvas" type="Sprite" parent="ViewportContainer/Viewport"]
+process_priority = -1
+script = ExtResource( 1 )
+
+[node name="EditorInterface" parent="." instance=ExtResource( 4 )]
+canvas_path = NodePath("../ViewportContainer/Viewport/Canvas")
+
+[connection signal="scale_updated" from="ViewportContainer" to="ViewportContainer/Viewport/Canvas" method="canvas_scale_updated"]

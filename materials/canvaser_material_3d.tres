@@ -1,139 +1,38 @@
-[gd_resource type="ShaderMaterial" load_steps=7 format=2]
+[gd_resource type="ShaderMaterial" load_steps=9 format=2]
 
 [ext_resource path="res://assets/strokes/stroke1_height.png" type="Texture" id=1]
 [ext_resource path="res://assets/2d/leinwand-orange-textur-hintergrund.png" type="Texture" id=2]
 [ext_resource path="res://assets/strokes/stroke1_normal.png" type="Texture" id=3]
-
-[sub_resource type="Shader" id=49]
-code = "shader_type spatial;
-render_mode async_visible, blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx, unshaded;
-
-const float stroke_size_bias = 0.5;
-
-uniform vec3 light_position;
-uniform vec4 light_color: hint_color;
-uniform vec4 shadow_color: hint_color;
-uniform float specularity = 10.0;
-
-uniform sampler2D source;
-uniform sampler2D stroke_height_texture;
-uniform sampler2D stroke_normal_texture;
-uniform sampler2D canvas;
-uniform sampler2D depth_motion;
-uniform float canvas_roughness;
-uniform float screen_width = 1024;
-uniform float screen_height = 600;
-uniform float smudge_amount = 1.0;
-uniform float offset_amount = 0.4;
-
-uniform vec4 albedo : hint_color;
-uniform sampler2D texture_albedo : hint_albedo;
-uniform int particles_anim_h_frames;
-uniform int particles_anim_v_frames;
-uniform bool particles_anim_loop;
-uniform vec3 uv1_scale;
-uniform vec3 uv1_offset;
-uniform vec3 uv2_scale;
-uniform vec3 uv2_offset;
-
-void vertex() {
-	UV=UV*uv1_scale.xy+uv1_offset.xy;
-	mat4 mat_world = mat4(normalize(CAMERA_MATRIX[0])*length(WORLD_MATRIX[0]),normalize(CAMERA_MATRIX[1])*length(WORLD_MATRIX[0]),normalize(CAMERA_MATRIX[2])*length(WORLD_MATRIX[2]),WORLD_MATRIX[3]);
-	mat_world = mat_world * mat4( vec4(cos(INSTANCE_CUSTOM.x),-sin(INSTANCE_CUSTOM.x), 0.0, 0.0), vec4(sin(INSTANCE_CUSTOM.x), cos(INSTANCE_CUSTOM.x), 0.0, 0.0),vec4(0.0, 0.0, 1.0, 0.0),vec4(0.0, 0.0, 0.0, 1.0));
-	MODELVIEW_MATRIX = INV_CAMERA_MATRIX * mat_world;
-	float h_frames = float(particles_anim_h_frames);
-	float v_frames = float(particles_anim_v_frames);
-	float particle_total_frames = float(particles_anim_h_frames * particles_anim_v_frames);
-	float particle_frame = floor(INSTANCE_CUSTOM.z * float(particle_total_frames));
-	if (!particles_anim_loop) {
-		particle_frame = clamp(particle_frame, 0.0, particle_total_frames - 1.0);
-	} else {
-		particle_frame = mod(particle_frame, particle_total_frames);
-	}	UV /= vec2(h_frames, v_frames);
-	UV += vec2(mod(particle_frame, h_frames) / h_frames, floor((particle_frame + 0.5) / h_frames) / v_frames);
-}
-
-float grainify(float x, float a) {
-	x -= 0.5;
-	a -= 0.5;
-	return max(min(canvas_roughness * (x + a) + 0.5, 1.0), 0.0);
-}
-
-void fragment() {
-//	generated start
-	vec2 base_uv = UV;
-	vec4 albedo_tex = texture(texture_albedo,base_uv);
-	albedo_tex *= COLOR;
-	
-	vec2 normalized_position = COLOR.xy;
-	float angle = COLOR.z;
-	float scale = COLOR.w;
-	mat2 rotation;
-	rotation[0] = vec2(cos(angle), -sin(angle));
-	rotation[1] = vec2(sin(angle), cos(angle));
-	
-//	ALBEDO = texture(source, normalized_position).rgb;
-	float ratio = screen_height / screen_width;
-	vec3 upper_color = texture(
-		source,
-		normalized_position + rotation * vec2(0.0, 0.5 * stroke_size_bias) * vec2(ratio, 1.0) * scale
-	).rgb;
-	vec3 lower_color = texture(
-		source,
-		normalized_position + rotation * vec2(0.0, -0.5 * stroke_size_bias) * vec2(ratio, 1.0) * scale
-	).rgb;
-	vec3 core_color = texture(source, normalized_position).rgb;
-	if (UV.y <= 0.5) {
-		ALBEDO = mix(upper_color, core_color, UV.y * 2.0);
-	} else {
-		ALBEDO = mix(core_color, lower_color, (UV.y - 0.5) * 2.0);
-	}
-	ALBEDO = mix(ALBEDO, core_color, (1.0 - smudge_amount) * texture(stroke_height_texture, UV).r);
-	
-//	ALBEDO = vec3(1.0);
-	
-	vec3 light = normalize(light_position - vec3(SCREEN_UV - vec2(0.5), 0.0));
-	vec3 camera = normalize(vec3(vec2(0.5) - SCREEN_UV, 1.0));
-	vec3 normal = normalize(texture(stroke_normal_texture, UV).rgb * 2.0 - vec3(1.0));
-	normal = vec3(rotation * normal.xy, normal.z);
-	vec3 r = reflect(-light, normal);
-	ALBEDO = ALBEDO * mix(vec3(1.0), shadow_color.rgb, dot(normal, light));
-	ALBEDO = ALBEDO + max(mix(vec3(0.0), light_color.rgb, pow(dot(r, camera), specularity)), vec3(0.0));
-//	ALBEDO = ALBEDO + vec3(r.z);
-//	ALBEDO = ALBEDO + vec3(dot(normal, light));
-	
-//	ALBEDO = texture(source, SCREEN_UV + rotation * vec2(0, texture(stroke_height_texture, UV).r) * 0.5).rgb;
-//	ALBEDO = texture(
-//		source,
-//		normalized_position + (rotation * (vec2(UV.x, 1.0 - UV.y) - vec2(0.5))) *  vec2(ratio, 1.0)
-//	).rgb;
-//	ALBEDO = texture(source, SCREEN_UV).rgb;
-	ALPHA = grainify(
-		texture(canvas, SCREEN_UV).x,
-		texture(stroke_height_texture, UV).a
-	);
-	ALPHA = texture(stroke_height_texture, UV).a;
-}
-"
+[ext_resource path="res://shaders/stroke_renderer.gdshader" type="Shader" id=4]
 
 [sub_resource type="ViewportTexture" id=54]
 viewport_path = NodePath("SceneManager/DepthMotion")
+
+[sub_resource type="OpenSimplexNoise" id=55]
+
+[sub_resource type="NoiseTexture" id=56]
+width = 1024
+height = 600
+bump_strength = 32.0
+noise = SubResource( 55 )
 
 [sub_resource type="ViewportTexture" id=50]
 viewport_path = NodePath("SceneManager/Base")
 
 [resource]
 resource_local_to_scene = true
-shader = SubResource( 49 )
+shader = ExtResource( 4 )
 shader_param/light_position = Vector3( -0.5, 0.5, 1 )
 shader_param/light_color = Color( 0.52549, 0.517647, 0.501961, 1 )
 shader_param/shadow_color = Color( 0.909804, 0.921569, 0.933333, 1 )
 shader_param/specularity = 20.0
+shader_param/rejection_sampling = true
 shader_param/canvas_roughness = null
 shader_param/screen_width = 1024.0
 shader_param/screen_height = 600.0
 shader_param/smudge_amount = 0.5
 shader_param/offset_amount = 0.4
+shader_param/distorsion_amount = 0.012
 shader_param/albedo = Color( 1, 1, 1, 1 )
 shader_param/particles_anim_h_frames = 1
 shader_param/particles_anim_v_frames = 1
@@ -142,8 +41,22 @@ shader_param/uv1_scale = Vector3( 1, 1, 1 )
 shader_param/uv1_offset = Vector3( 0, 0, 0 )
 shader_param/uv2_scale = Vector3( 1, 1, 1 )
 shader_param/uv2_offset = Vector3( 0, 0, 0 )
+shader_param/highlight_threshold = 0.9
+shader_param/highlight_fade_distance = 0.05
+shader_param/highlight_lod = 2.0
+shader_param/highlight_bias = null
+shader_param/shadow_threshold = 0.4
+shader_param/shadow_fade_distance = 0.05
+shader_param/shadow_lod = 4.0
+shader_param/shadow_cutoff = 0.28
+shader_param/shadow_fringe_bias = Color( 0.607843, 0.317647, 0.105882, 1 )
+shader_param/shadow_fringe_amount = 0.3
+shader_param/radius = 1
+shader_param/offset = Vector3( 0, 0, 0 )
+shader_param/buffer_width = 20
 shader_param/source = SubResource( 50 )
 shader_param/stroke_height_texture = ExtResource( 1 )
 shader_param/stroke_normal_texture = ExtResource( 3 )
 shader_param/canvas = ExtResource( 2 )
 shader_param/depth_motion = SubResource( 54 )
+shader_param/noise_texture = SubResource( 56 )

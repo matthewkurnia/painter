@@ -1,0 +1,197 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://editor/icons/circle.png" type="Texture" id=1]
+[ext_resource path="res://editor/icons/edit-2-fill.png" type="Texture" id=2]
+[ext_resource path="res://editor/icons/arrow-go-back-line.png" type="Texture" id=3]
+[ext_resource path="res://editor/icons/rect.png" type="Texture" id=4]
+[ext_resource path="res://editor/icons/arrow-go-forward-line.png" type="Texture" id=5]
+[ext_resource path="res://editor/icons/eraser-fill.png" type="Texture" id=6]
+[ext_resource path="res://editor/EditorInterface.gd" type="Script" id=7]
+
+[sub_resource type="InputEventKey" id=1]
+control = true
+command = true
+scancode = 44
+
+[sub_resource type="ShortCut" id=2]
+shortcut = SubResource( 1 )
+
+[node name="EditorInterface" type="Control"]
+anchor_right = 1.0
+script = ExtResource( 7 )
+
+[node name="Panel" type="Panel" parent="."]
+anchor_right = 1.0
+rect_min_size = Vector2( 0, 40 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="Padding1" type="Control" parent="Panel/HBoxContainer"]
+margin_right = 15.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 15, 0 )
+
+[node name="UndoContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+margin_left = 19.0
+margin_right = 44.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 25, 0 )
+
+[node name="Button" type="Button" parent="Panel/HBoxContainer/UndoContainer"]
+margin_top = 7.0
+margin_right = 25.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 25, 25 )
+hint_tooltip = "Undo"
+shortcut = SubResource( 2 )
+icon = ExtResource( 3 )
+icon_align = 1
+expand_icon = true
+
+[node name="RedoContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+margin_left = 48.0
+margin_right = 73.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 25, 0 )
+
+[node name="Button" type="Button" parent="Panel/HBoxContainer/RedoContainer"]
+margin_top = 7.0
+margin_right = 25.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 25, 25 )
+hint_tooltip = "Redo"
+icon = ExtResource( 5 )
+icon_align = 1
+expand_icon = true
+
+[node name="Padding2" type="Control" parent="Panel/HBoxContainer"]
+margin_left = 77.0
+margin_right = 92.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 15, 0 )
+
+[node name="PencilContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+margin_left = 96.0
+margin_right = 121.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 25, 0 )
+
+[node name="Button" type="Button" parent="Panel/HBoxContainer/PencilContainer"]
+margin_top = 7.0
+margin_right = 25.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 25, 25 )
+hint_tooltip = "Pencil"
+icon = ExtResource( 2 )
+icon_align = 1
+expand_icon = true
+
+[node name="EraserContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+margin_left = 125.0
+margin_right = 150.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 25, 0 )
+
+[node name="Button" type="Button" parent="Panel/HBoxContainer/EraserContainer"]
+margin_top = 7.0
+margin_right = 25.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 25, 25 )
+hint_tooltip = "Eraser"
+icon = ExtResource( 6 )
+icon_align = 1
+expand_icon = true
+
+[node name="Padding3" type="Control" parent="Panel/HBoxContainer"]
+margin_left = 154.0
+margin_right = 169.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 15, 0 )
+
+[node name="BrushShapeLabel" type="Label" parent="Panel/HBoxContainer"]
+margin_left = 173.0
+margin_top = 13.0
+margin_right = 256.0
+margin_bottom = 27.0
+text = "Brush shape:"
+
+[node name="SquareShapeContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+margin_left = 260.0
+margin_right = 285.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 25, 0 )
+
+[node name="Button" type="Button" parent="Panel/HBoxContainer/SquareShapeContainer"]
+margin_top = 7.0
+margin_right = 25.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 25, 25 )
+icon = ExtResource( 4 )
+icon_align = 1
+expand_icon = true
+
+[node name="CircleShapeContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+margin_left = 289.0
+margin_right = 314.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 25, 0 )
+
+[node name="Button" type="Button" parent="Panel/HBoxContainer/CircleShapeContainer"]
+margin_top = 7.0
+margin_right = 25.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 25, 25 )
+icon = ExtResource( 1 )
+icon_align = 1
+expand_icon = true
+
+[node name="Padding4" type="Control" parent="Panel/HBoxContainer"]
+margin_left = 318.0
+margin_right = 333.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 15, 0 )
+
+[node name="BrushSizeLabel" type="Label" parent="Panel/HBoxContainer"]
+margin_left = 337.0
+margin_top = 13.0
+margin_right = 408.0
+margin_bottom = 27.0
+text = "Brush size:"
+
+[node name="BrushSizeContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+margin_left = 412.0
+margin_right = 486.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 25, 0 )
+
+[node name="SpinBox" type="SpinBox" parent="Panel/HBoxContainer/BrushSizeContainer"]
+margin_top = 8.0
+margin_right = 74.0
+margin_bottom = 32.0
+min_value = 1.0
+max_value = 1000.0
+value = 8.0
+suffix = "px"
+
+[node name="Padding5" type="Control" parent="Panel/HBoxContainer"]
+margin_left = 490.0
+margin_right = 505.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 15, 0 )
+
+[node name="ColorPickerContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+margin_left = 509.0
+margin_right = 541.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 25, 0 )
+hint_tooltip = "Color Picker"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="Panel/HBoxContainer/ColorPickerContainer"]
+margin_top = 8.0
+margin_right = 32.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 32, 24 )
+color = Color( 0.564706, 0.129412, 0.129412, 1 )
+edit_alpha = false
