@@ -16,30 +16,27 @@ scancode = 44
 [sub_resource type="ShortCut" id=2]
 shortcut = SubResource( 1 )
 
-[node name="EditorInterface" type="Control"]
-anchor_right = 1.0
-script = ExtResource( 7 )
-
-[node name="Panel" type="Panel" parent="."]
+[node name="EditorInterface" type="Panel"]
 anchor_right = 1.0
 rect_min_size = Vector2( 0, 40 )
+script = ExtResource( 7 )
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
 margin_right = 40.0
 margin_bottom = 40.0
 
-[node name="Padding1" type="Control" parent="Panel/HBoxContainer"]
+[node name="Padding1" type="Control" parent="HBoxContainer"]
 margin_right = 15.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 15, 0 )
 
-[node name="UndoContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+[node name="UndoContainer" type="CenterContainer" parent="HBoxContainer"]
 margin_left = 19.0
 margin_right = 44.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 25, 0 )
 
-[node name="Button" type="Button" parent="Panel/HBoxContainer/UndoContainer"]
+[node name="Button" type="Button" parent="HBoxContainer/UndoContainer"]
 margin_top = 7.0
 margin_right = 25.0
 margin_bottom = 32.0
@@ -50,13 +47,13 @@ icon = ExtResource( 3 )
 icon_align = 1
 expand_icon = true
 
-[node name="RedoContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+[node name="RedoContainer" type="CenterContainer" parent="HBoxContainer"]
 margin_left = 48.0
 margin_right = 73.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 25, 0 )
 
-[node name="Button" type="Button" parent="Panel/HBoxContainer/RedoContainer"]
+[node name="Button" type="Button" parent="HBoxContainer/RedoContainer"]
 margin_top = 7.0
 margin_right = 25.0
 margin_bottom = 32.0
@@ -66,19 +63,19 @@ icon = ExtResource( 5 )
 icon_align = 1
 expand_icon = true
 
-[node name="Padding2" type="Control" parent="Panel/HBoxContainer"]
+[node name="Padding2" type="Control" parent="HBoxContainer"]
 margin_left = 77.0
 margin_right = 92.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 15, 0 )
 
-[node name="PencilContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+[node name="PencilContainer" type="CenterContainer" parent="HBoxContainer"]
 margin_left = 96.0
 margin_right = 121.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 25, 0 )
 
-[node name="Button" type="Button" parent="Panel/HBoxContainer/PencilContainer"]
+[node name="Button" type="Button" parent="HBoxContainer/PencilContainer"]
 margin_top = 7.0
 margin_right = 25.0
 margin_bottom = 32.0
@@ -88,13 +85,13 @@ icon = ExtResource( 2 )
 icon_align = 1
 expand_icon = true
 
-[node name="EraserContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+[node name="EraserContainer" type="CenterContainer" parent="HBoxContainer"]
 margin_left = 125.0
 margin_right = 150.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 25, 0 )
 
-[node name="Button" type="Button" parent="Panel/HBoxContainer/EraserContainer"]
+[node name="Button" type="Button" parent="HBoxContainer/EraserContainer"]
 margin_top = 7.0
 margin_right = 25.0
 margin_bottom = 32.0
@@ -104,26 +101,26 @@ icon = ExtResource( 6 )
 icon_align = 1
 expand_icon = true
 
-[node name="Padding3" type="Control" parent="Panel/HBoxContainer"]
+[node name="Padding3" type="Control" parent="HBoxContainer"]
 margin_left = 154.0
 margin_right = 169.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 15, 0 )
 
-[node name="BrushShapeLabel" type="Label" parent="Panel/HBoxContainer"]
+[node name="BrushShapeLabel" type="Label" parent="HBoxContainer"]
 margin_left = 173.0
 margin_top = 13.0
 margin_right = 256.0
 margin_bottom = 27.0
 text = "Brush shape:"
 
-[node name="SquareShapeContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+[node name="SquareShapeContainer" type="CenterContainer" parent="HBoxContainer"]
 margin_left = 260.0
 margin_right = 285.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 25, 0 )
 
-[node name="Button" type="Button" parent="Panel/HBoxContainer/SquareShapeContainer"]
+[node name="Button" type="Button" parent="HBoxContainer/SquareShapeContainer"]
 margin_top = 7.0
 margin_right = 25.0
 margin_bottom = 32.0
@@ -132,13 +129,13 @@ icon = ExtResource( 4 )
 icon_align = 1
 expand_icon = true
 
-[node name="CircleShapeContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+[node name="CircleShapeContainer" type="CenterContainer" parent="HBoxContainer"]
 margin_left = 289.0
 margin_right = 314.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 25, 0 )
 
-[node name="Button" type="Button" parent="Panel/HBoxContainer/CircleShapeContainer"]
+[node name="Button" type="Button" parent="HBoxContainer/CircleShapeContainer"]
 margin_top = 7.0
 margin_right = 25.0
 margin_bottom = 32.0
@@ -147,26 +144,26 @@ icon = ExtResource( 1 )
 icon_align = 1
 expand_icon = true
 
-[node name="Padding4" type="Control" parent="Panel/HBoxContainer"]
+[node name="Padding4" type="Control" parent="HBoxContainer"]
 margin_left = 318.0
 margin_right = 333.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 15, 0 )
 
-[node name="BrushSizeLabel" type="Label" parent="Panel/HBoxContainer"]
+[node name="BrushSizeLabel" type="Label" parent="HBoxContainer"]
 margin_left = 337.0
 margin_top = 13.0
 margin_right = 408.0
 margin_bottom = 27.0
 text = "Brush size:"
 
-[node name="BrushSizeContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+[node name="BrushSizeContainer" type="CenterContainer" parent="HBoxContainer"]
 margin_left = 412.0
 margin_right = 486.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 25, 0 )
 
-[node name="SpinBox" type="SpinBox" parent="Panel/HBoxContainer/BrushSizeContainer"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/BrushSizeContainer"]
 margin_top = 8.0
 margin_right = 74.0
 margin_bottom = 32.0
@@ -175,20 +172,20 @@ max_value = 1000.0
 value = 8.0
 suffix = "px"
 
-[node name="Padding5" type="Control" parent="Panel/HBoxContainer"]
+[node name="Padding5" type="Control" parent="HBoxContainer"]
 margin_left = 490.0
 margin_right = 505.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 15, 0 )
 
-[node name="ColorPickerContainer" type="CenterContainer" parent="Panel/HBoxContainer"]
+[node name="ColorPickerContainer" type="CenterContainer" parent="HBoxContainer"]
 margin_left = 509.0
 margin_right = 541.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 25, 0 )
 hint_tooltip = "Color Picker"
 
-[node name="ColorPickerButton" type="ColorPickerButton" parent="Panel/HBoxContainer/ColorPickerContainer"]
+[node name="ColorPickerButton" type="ColorPickerButton" parent="HBoxContainer/ColorPickerContainer"]
 margin_top = 8.0
 margin_right = 32.0
 margin_bottom = 32.0

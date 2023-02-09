@@ -1,4 +1,4 @@
-extends Control
+extends Panel
 
 
 enum {
@@ -19,15 +19,15 @@ const BrushType := preload("res://editor/Canvas.gd").BrushType
 export var canvas_path: NodePath
 
 
-onready var panel := $Panel
-onready var undo_button := $Panel/HBoxContainer/UndoContainer/Button
-onready var redo_button := $Panel/HBoxContainer/RedoContainer/Button
-onready var pencil_button := $Panel/HBoxContainer/PencilContainer/Button
-onready var eraser_button := $Panel/HBoxContainer/EraserContainer/Button
-onready var square_button := $Panel/HBoxContainer/SquareShapeContainer/Button
-onready var circle_button := $Panel/HBoxContainer/CircleShapeContainer/Button
-onready var brush_size_box := $Panel/HBoxContainer/BrushSizeContainer/SpinBox
-onready var color_picker := $Panel/HBoxContainer/ColorPickerContainer/ColorPickerButton
+onready var panel := self
+onready var undo_button := $HBoxContainer/UndoContainer/Button
+onready var redo_button := $HBoxContainer/RedoContainer/Button
+onready var pencil_button := $HBoxContainer/PencilContainer/Button
+onready var eraser_button := $HBoxContainer/EraserContainer/Button
+onready var square_button := $HBoxContainer/SquareShapeContainer/Button
+onready var circle_button := $HBoxContainer/CircleShapeContainer/Button
+onready var brush_size_box := $HBoxContainer/BrushSizeContainer/SpinBox
+onready var color_picker := $HBoxContainer/ColorPickerContainer/ColorPickerButton
 
 onready var canvas = get_node_or_null(canvas_path)
 
