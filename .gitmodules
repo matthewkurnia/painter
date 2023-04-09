@@ -1,0 +1,3 @@
+[submodule "submodule_test/gd-obj"]
+	path = submodule_test/gd-obj
+	url = https://github.com/matthewkurnia/gd-obj.git
